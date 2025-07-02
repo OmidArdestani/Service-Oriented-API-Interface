@@ -278,11 +278,10 @@ sequenceDiagram
     Discovery-->>Client: List of service providers
     Client->>Provider: AssignTask (e.g., resizeImage)
     Provider-->>Client: Status (Processing)
-    Note right of Provider: Provider processes the task
-    Provider-->>Client: TaskResult (Completed)
-    Client->>Provider: GetStatus (optional)
+
+    Client->>Provider: GetStatus (Periodic)
     Provider-->>Client: Status (Completed)
-    Client->>Provider: GetResult (optional)
+    Client->>Provider: GetResult (If needed)
     Provider-->>Client: TaskResult (with result data)
 ```
 
