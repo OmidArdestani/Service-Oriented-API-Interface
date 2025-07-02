@@ -288,3 +288,46 @@ sequenceDiagram
 ---
 
 This diagram shows the typical interactions: service discovery, task assignment, status/result queries, and responses. The architecture supports extensibility for additional services and operations.
+
+# Network Schema: Service-Oriented API Interface (Local Network)
+
+This diagram shows the communication flow between clients and service providers in a local network, focusing on the nodes and their interactions. Each service provider can offer multiple services.
+
+## Network Topology
+
+```mermaid
+graph TD
+    subgraph Local Network
+        direction LR
+        Client1["Client 1"]
+        Client2["Client 2"]
+        ClientN["Client N"]
+        SP1["Service Provider 1"]
+        SP2["Service Provider 2"]
+        SPN["Service Provider N"]
+        S1A["Service A"]
+        S1B["Service B"]
+        S2A["Service C"]
+        S2B["Service D"]
+        SNX["Service X"]
+        SNY["Service Y"]
+    end
+
+    SP1 -- provides --> S1A
+    SP1 -- provides --> S1B
+    SP2 -- provides --> S2A
+    SP2 -- provides --> S2B
+    SPN -- provides --> SNX
+    SPN -- provides --> SNY
+
+    Client1 -- communicates --> SP1
+    Client1 -- communicates --> SP2
+    Client2 -- communicates --> SP1
+    ClientN -- communicates --> SPN
+    %% Add more connections as needed
+```
+
+---
+
+This schema demonstrates the decentralized, peer-to-peer nature of the architecture, showing only the nodes, their communication links, and that each service provider can offer multiple services within a local network.
+
