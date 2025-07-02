@@ -1,7 +1,7 @@
 # Service-Oriented API Interface Design Document
 
 **Date:** July 2, 2025  
-**Author:** Brainstormer AI  
+**Author:** Omid Ardestani 
 **Version:** 1.1
 
 ---
