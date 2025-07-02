@@ -291,7 +291,7 @@ This diagram shows the typical interactions: service discovery, task assignment,
 
 # Network Schema: Service-Oriented API Interface (Local Network)
 
-This diagram shows the communication flow between clients and service providers in a local network, focusing on the nodes and their interactions. Each service provider can offer multiple services.
+This diagram shows the communication flow between clients and service providers in a local network, focusing on the nodes and their interactions. Each service provider can offer multiple services, and each client acts as a service repository.
 
 ## Network Topology
 
@@ -299,9 +299,9 @@ This diagram shows the communication flow between clients and service providers 
 graph TD
     subgraph Local Network
         direction LR
-        Client1["Client 1"]
-        Client2["Client 2"]
-        ClientN["Client N"]
+        Client1["Client 1 + (Service Repository)"]
+        Client2["Client 2 + (Service Repository)"]
+        ClientN["Client N + (Service Repository)"]
         SP1["Service Provider 1"]
         SP2["Service Provider 2"]
         SPN["Service Provider N"]
@@ -329,5 +329,4 @@ graph TD
 
 ---
 
-This schema demonstrates the decentralized, peer-to-peer nature of the architecture, showing only the nodes, their communication links, and that each service provider can offer multiple services within a local network.
-
+This schema demonstrates the decentralized, peer-to-peer nature of the architecture, showing that each client maintains its own service repository, which stores information about available service providers and their services within a local network.
