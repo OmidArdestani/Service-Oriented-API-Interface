@@ -2,120 +2,103 @@
 import uuid
 from service_provider.discovery_service import ServiceDiscoveryBroadcaster
 from service_provider.ws_server import ServiceWebSocketServer
+from service_provider_base import ServiceProviderBase
 
 
 SERVICE_ID = str(uuid.uuid4())
 SERVICE_NAME = "ImageProcessingService"
 SERVICE_VERSION = "1.2.0"
-ENDPOINT = "127.0.0.1:8080"
-CAPABILITIES = [
-    {"key": "resizeImage", "settings": [{"string": "inputPath"}, {"string": "output"}, {"int": "width"}, {"int": "height"}]},
-    {"key": "applyFilter", "settings": [{"string": "name"}, {"float": "size"}]},
-    {"key": "convertFormat", "settings": [{"float": "format"}]}
-]
-
-service_info = {
-    "serviceId": SERVICE_ID,
-    "serviceName": SERVICE_NAME,
-    "serviceVersion": SERVICE_VERSION,
-    "endpoint": ENDPOINT,
-    "capabilities": CAPABILITIES,
-    "status": "Online",
-    "load": 0.0
+PORT = 8080
+CAPABILITIES = {
+    "resizeImage" : {
+        "status": "Ready",
+        "settings": [
+            {"string": "inputPath"},
+            {"string": "output"}, 
+            {"int": "width"}, 
+            {"int": "height"}
+        ]
+    },
+    "applyFilter" : {
+        "status": "Ready",
+        "settings": [
+            {"string": "name"}, 
+            {"float": "size"}
+        ]
+    },
+    "convertFormat" : {
+        "status": "Ready",
+        "settings": [
+            {"float": "format"}
+        ]
+    }
 }
 
-# Store task statuses and results
-task_store = {}
+class ServiceProviderBEBuilder(ServiceProviderBase):
 
-def handle_assign_task(msg, websocket):
-    import uuid
-    global task_store
-    payload = msg.get("payload", {})
-    task_id = payload.get("taskId", str(uuid.uuid4()))
-    # Mark as processing
-    task_store[task_id] = {"status": "Processing", "result": None}
-    # Simulate processing (immediate for demo)
-    if payload.get("operation") == "resizeImage":
-        result = {
-            "type": "TaskResult",
-            "messageId": msg.get("messageId", "") + "-result",
-            "timestamp": "2025-07-02T12:00:00Z",
-            "payload": {
-                "taskId": task_id,
-                "status": "Completed",
-                "resultData": {
-                    "outputImagePath": payload.get("taskParameters", {}).get("outputPath", "output.jpg"),
-                    "processedByServiceId": service_info["serviceId"],
-                    "executionDurationMs": 1234
-                },
-                "originalClientId": payload.get("callbackClientId", "")
-            }
+    def __init__(self):
+        super().__init__(SERVICE_NAME, SERVICE_VERSION, PORT, CAPABILITIES)
+
+    def resize_image(self, task_id, parameters, base_result):
+        begin_date = parameters.get("inputPath", "")
+        base_result["payload"]["resultData"] = {
+            "inputPath": begin_date,
+            "changeLists": [
+                {"number": 101, "date": begin_date or "2024-01-01"},
+                {"number": 102, "date": "2024-01-02"}
+            ],
+            "processedByServiceId": self.service_info["serviceId"],
+            "executionDurationMs": 1234
         }
         # Store result and mark as done
-        task_store[task_id]["result"] = result
-        task_store[task_id]["status"] = "Done"
+        self.task_store[task_id]["result"] = base_result
+        self.task_store[task_id]["status"] = "Done"
+        CAPABILITIES["getChangeLists"]["status"] = "Ready"
 
-def handle_get_status(msg, websocket):
-    import json
-    import asyncio
-    payload = msg.get("payload", {})
-    task_id = payload.get("taskId")
-    task_status = task_store.get(task_id, {}).get("status", "Unknown")
-    status_resp = {
-        "type": "Status",
-        "serviceId": service_info["serviceId"],
-        "serviceName": service_info["serviceName"],
-        "taskId": task_id,
-        "taskStatus": task_status,
-        "status": service_info["status"],
-        "load": service_info["load"]
-    }
-    coro = websocket.send(json.dumps(status_resp))
-    if asyncio.iscoroutine(coro):
-        return coro
-    return None
+    def apply_filter(self, task_id, parameters, base_result):
+        change_list_number = parameters.get("changeListNumber", 0)
+        be_file_output_path = parameters.get("BEFileOutputPath", "output/")
+        be_file_name = parameters.get("BEFileName", "output.be")
+        base_result["payload"]["resultData"] = {
+            "changeListNumber": change_list_number,
+            "BEFileOutputPath": be_file_output_path,
+            "BEFileName": be_file_name,
+            "outputFilePath": f"{be_file_output_path}/{be_file_name}",
+            "processedByServiceId": self.service_info["serviceId"],
+            "executionDurationMs": 1234
+        }
+        # Store result and mark as done
+        self.task_store[task_id]["result"] = base_result
+        self.task_store[task_id]["status"] = "Done"
+        CAPABILITIES["runBuildOnChangeList"]["status"] = "Ready"
 
-def handle_get_result(msg, websocket):
-    import json
-    import asyncio
-    payload = msg.get("payload", {})
-    task_id = payload.get("taskId")
-    result = task_store.get(task_id, {}).get("result")
-    if result:
-        coro = websocket.send(json.dumps(result))
-        if asyncio.iscoroutine(coro):
-            return coro
-    else:
-        # No result yet
-        no_result = {"type": "TaskResult", "error": "Result not ready"}
-        coro = websocket.send(json.dumps(no_result))
-        if asyncio.iscoroutine(coro):
-            return coro
-    return None
+    def convert_format(self, task_id, parameters, base_result):
+        be_file_output_path = parameters.get("BEFileOutputPath", "output/")
+        be_file_name = parameters.get("BEFileName", "output.be")
+        base_result["payload"]["resultData"] = {
+            "BEFileOutputPath": be_file_output_path,
+            "BEFileName": be_file_name,
+            "outputFilePath": f"{be_file_output_path}/{be_file_name}",
+            "processedByServiceId": self.service_info["serviceId"],
+            "executionDurationMs": 1234
+        }
+        # Store result and mark as done
+        self.task_store[task_id]["result"] = base_result
+        self.task_store[task_id]["status"] = "Done"
+        CAPABILITIES["runBuildOnLatest"]["status"] = "Ready"
 
-def dummy_service_logic(msg, websocket):
-    import asyncio
-    if msg.get("type") == "AssignTask":
-        asyncio.get_event_loop().call_later(10, handle_assign_task, msg, websocket)
+    def handle_assign_task(self, task_id, operation, parameters, base_result):
+        import threading
 
-        return handle_get_status(msg, websocket)
-
-    elif msg.get("type") == "GetStatus":
-        return handle_get_status(msg, websocket)
-
-    elif msg.get("type") == "GetResult":
-        return handle_get_result(msg, websocket)
-
-    return None
-
-def main():
-    broadcaster = ServiceDiscoveryBroadcaster(service_info)
-    broadcaster.start()
-    ws_server = ServiceWebSocketServer('0.0.0.0', 8080, None, None, dummy_service_logic)
-    
-    import asyncio
-    asyncio.get_event_loop().run_until_complete(ws_server.start())
-    asyncio.get_event_loop().run_forever()
+        if operation == "resizeImage":
+            thread = threading.Thread(target=self.resize_image, args=(task_id, parameters, base_result))
+            thread.start()
+        elif operation == "applyFilter":
+            thread = threading.Thread(target=self.apply_filter, args=(task_id, parameters, base_result))
+            thread.start()
+        elif operation == "convertFormat":
+            thread = threading.Thread(target=self.convert_format, args=(task_id, parameters, base_result))
+            thread.start()
 
 if __name__ == "__main__":
-    main()
+    ServiceProviderBEBuilder().run()

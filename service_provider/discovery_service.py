@@ -10,8 +10,8 @@ class ServiceDiscoveryBroadcaster:
     def __init__(self, service_info):
         self.service_info = service_info
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        self.sock.bind(('', UDP_SERVICE_DISCOVERY_PORT))
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind(('0.0.0.0', UDP_SERVICE_DISCOVERY_PORT))
         self.running = False
 
     def broadcast(self, addr=None):
