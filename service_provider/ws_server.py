@@ -27,6 +27,7 @@ class ServiceWebSocketServer:
                 print(f"WebSocket error: {e}")
 
     def start(self):
+        """Start the WebSocket server and return the server coroutine"""
         if self.ssl_context:
             return websockets.serve(self.handler, self.host, self.port, ssl=self.ssl_context)
         else:

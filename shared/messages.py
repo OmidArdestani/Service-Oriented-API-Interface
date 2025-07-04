@@ -22,6 +22,12 @@ class MessageTypes:
     ACK = "Ack"
     CLIENT_DISCOVERY_REQUEST = "ClientServiceDiscoveryRequest"
     SERVICE_ADVERTISEMENT = "ServiceAdvertisement"
+    # Multi-provider discovery messages
+    PROVIDER_DISCOVERY_REQUEST = "ProviderDiscoveryRequest"
+    PROVIDER_DISCOVERY_RESPONSE = "ProviderDiscoveryResponse"
+    PROVIDER_REGISTRATION = "ProviderRegistration"
+    PROVIDER_NOTIFICATION = "ProviderNotification"
+    PROVIDER_HEARTBEAT = "ProviderHeartbeat"
 
 
 def build_message(msg_type: str, payload: Dict[str, Any], message_id: str = None, timestamp: str = None) -> Dict[str, Any]:

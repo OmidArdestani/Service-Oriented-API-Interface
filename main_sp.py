@@ -4,11 +4,12 @@ from service_provider.discovery_service import ServiceDiscoveryBroadcaster
 from service_provider.ws_server import ServiceWebSocketServer
 from service_provider_base import ServiceProviderBase
 
+import random
 
 SERVICE_ID = str(uuid.uuid4())
 SERVICE_NAME = "ImageProcessingService"
 SERVICE_VERSION = "1.2.0"
-PORT = 8080
+PORT = random.randint(8080, 8090)
 CAPABILITIES = {
     "resizeImage" : {
         "status": "Ready",
