@@ -2,7 +2,7 @@
 import uuid
 from service_provider.discovery_service import ServiceDiscoveryBroadcaster
 from service_provider.ws_server import ServiceWebSocketServer
-from service_provider_base import ServiceProviderBase
+from service_provider.service_provider_base import ServiceProviderBase
 
 import random
 
