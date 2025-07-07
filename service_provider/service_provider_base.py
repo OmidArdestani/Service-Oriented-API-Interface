@@ -15,7 +15,7 @@ class ServiceProviderBase:
     SERVICE_NAME    = "Logic Pipeline Test Runner"
     SERVICE_VERSION = "1.0.0"
     PORT            = 8081
-    ENDPOINT        = f"localhost:{PORT}"
+    ENDPOINT        = f"0.0.0.0:{PORT}"
     CAPABILITIES    = []
 
     service_info    = {}
@@ -124,7 +124,7 @@ class ServiceProviderBase:
     def run(self):
         broadcaster = ServiceDiscoveryBroadcaster(self.service_info)
         broadcaster.start()
-        ws_server = ServiceWebSocketServer('localhost', self.PORT, None, None, self.dummy_service_logic_base)
+        ws_server = ServiceWebSocketServer('0.0.0.0', self.PORT, None, None, self.dummy_service_logic_base)
 
         import asyncio
         asyncio.get_event_loop().run_until_complete(ws_server.start())
